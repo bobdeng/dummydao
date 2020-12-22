@@ -13,12 +13,12 @@ public class DummyDao<T> {
     private Class<T> clz;
 
     public DummyDao(Class<T> clz) {
-
         this.clz = clz;
     }
 
     public List<T> all() {
-        return this.jsonList.stream().map(json -> new Gson().fromJson(json, clz))
+        return this.jsonList.stream()
+                .map(json -> new Gson().fromJson(json, clz))
                 .collect(Collectors.toList());
     }
 
@@ -43,11 +43,23 @@ public class DummyDao<T> {
     }
 
     private boolean notSame(T entity, String idName, T newObject) {
+        return !Objects.equals(getField(idName,entity), getField(idName,newObject));
+    }
+
+    private Object getField(String field, T object) {
         try {
-            Method method = clz.getMethod("get" + idName.substring(0, 1).toUpperCase() + idName.substring(1));
-            return !Objects.equals(method.invoke(entity), method.invoke(newObject));
+            Method method = clz.getMethod("get" + field.substring(0, 1).toUpperCase() + field.substring(1));
+            return method.invoke(object);
         } catch (Exception e) {
             throw new MethodException(e);
         }
+    }
+
+    public void deleteById(String idName, Object newObject) {
+        this.jsonList = jsonList.stream()
+                .map(json -> new Gson().fromJson(json, clz))
+                .filter(entity -> !Objects.equals(newObject,getField(idName,entity)))
+                .map(entity -> new Gson().toJson(entity))
+                .collect(Collectors.toList());
     }
 }

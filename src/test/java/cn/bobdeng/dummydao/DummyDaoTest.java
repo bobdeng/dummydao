@@ -45,6 +45,13 @@ public class DummyDaoTest {
         dummyDao.insert(new TestEntityNoGetter(1, "hello1"));
         dummyDao.updateById(new TestEntityNoGetter(1, "world"), "id");
     }
+    @Test
+    public void should_remove_when_delete(){
+        DummyDao<TestEntityOther> dummyDao = new DummyDao<>(TestEntityOther.class);
+        dummyDao.insert(new TestEntityOther(1, "hello1"));
+        dummyDao.deleteById("id",1);
+        assertThat(dummyDao.all().isEmpty(),is(true));
+    }
 
 
 }
