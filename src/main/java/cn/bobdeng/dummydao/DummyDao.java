@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DummyDao<T> {
@@ -43,7 +44,7 @@ public class DummyDao<T> {
     }
 
     private boolean notSame(T entity, String idName, T newObject) {
-        return !Objects.equals(getField(idName,entity), getField(idName,newObject));
+        return !Objects.equals(getField(idName, entity), getField(idName, newObject));
     }
 
     private Object getField(String field, T object) {
@@ -58,8 +59,15 @@ public class DummyDao<T> {
     public void deleteById(String idName, Object newObject) {
         this.jsonList = jsonList.stream()
                 .map(json -> new Gson().fromJson(json, clz))
-                .filter(entity -> !Objects.equals(newObject,getField(idName,entity)))
+                .filter(entity -> !Objects.equals(newObject, getField(idName, entity)))
                 .map(entity -> new Gson().toJson(entity))
                 .collect(Collectors.toList());
+    }
+
+    public Optional<T> findById(String idField, Object value) {
+        return jsonList.stream()
+                .map(json -> new Gson().fromJson(json, clz))
+                .filter(entity -> Objects.equals(value, getField(idField, entity)))
+                .findFirst();
     }
 }

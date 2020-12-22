@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,6 +52,12 @@ public class DummyDaoTest {
         dummyDao.insert(new TestEntityOther(1, "hello1"));
         dummyDao.deleteById("id",1);
         assertThat(dummyDao.all().isEmpty(),is(true));
+    }
+    @Test
+    public void should_return_find_by_id(){
+        DummyDao<TestEntityOther> dummyDao = new DummyDao<>(TestEntityOther.class);
+        dummyDao.insert(new TestEntityOther(1, "hello1"));
+        assertThat(dummyDao.findById("id",1),is(Optional.of(new TestEntityOther(1, "hello1"))));
     }
 
 
