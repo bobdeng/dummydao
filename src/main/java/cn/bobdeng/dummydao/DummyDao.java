@@ -2,12 +2,10 @@ package cn.bobdeng.dummydao;
 
 import com.google.gson.Gson;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DummyDao<T> {
@@ -29,13 +27,6 @@ public class DummyDao<T> {
         return entity;
     }
 
-    public Optional<T> findBy(String columnName, Object value) {
-        return jsonList.stream()
-                .map(json -> new Gson().fromJson(json, clz))
-                .peek(t -> System.out.println(t.getClass()))
-                .findFirst();
-    }
-
     public void updateById(T newObject, String idName) {
         this.jsonList = jsonList.stream()
                 .map(json -> new Gson().fromJson(json, clz))
@@ -55,13 +46,8 @@ public class DummyDao<T> {
         try {
             Method method = clz.getMethod("get" + idName.substring(0, 1).toUpperCase() + idName.substring(1));
             return !Objects.equals(method.invoke(entity), method.invoke(newObject));
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new MethodException(e);
         }
-        return true;
     }
 }
