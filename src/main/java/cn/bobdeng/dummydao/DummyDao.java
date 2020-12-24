@@ -2,22 +2,29 @@ package cn.bobdeng.dummydao;
 
 import com.google.gson.Gson;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DummyDao<T> {
+public class DummyDao<T, PK> {
     private List<String> jsonList = new ArrayList<>();
     private final Class<T> clz;
     private final String primaryKey;
+    private final IdGenerator<PK> idGenerator;
+
+    public DummyDao(Class<T> clz, String primaryKey, IdGenerator<PK> idGenerator) {
+        this.clz = clz;
+        this.primaryKey = primaryKey;
+        this.idGenerator = idGenerator;
+    }
 
     public DummyDao(Class<T> clz) {
-        this(clz, "id");
+        this(clz, "id", null);
     }
 
     public DummyDao(Class<T> clz, String primaryKey) {
-        this.clz = clz;
-        this.primaryKey = primaryKey;
+        this(clz, primaryKey, null);
     }
 
     public List<T> all() {
@@ -50,10 +57,10 @@ public class DummyDao<T> {
         return !Objects.equals(getField(idName, entity), getField(idName, newObject));
     }
 
-    private Object getField(String field, T object) {
+    private PK getField(String field, T object) {
         try {
             Method method = clz.getMethod("get" + field.substring(0, 1).toUpperCase() + field.substring(1));
-            return method.invoke(object);
+            return (PK) method.invoke(object);
         } catch (Exception e) {
             throw new MethodException(e);
         }
@@ -79,12 +86,34 @@ public class DummyDao<T> {
     }
 
 
-    public void save(T newObject) {
+    public T save(T newObject) {
         boolean exist = findById(primaryKey, getField(primaryKey, newObject)).isPresent();
         if (exist) {
             updateById(newObject, primaryKey);
-            return;
+            return null;
         }
-        insert(newObject);
+        T insertObject = cloneObject(newObject);
+        if (!idGenerator.hasId(getField(primaryKey, insertObject))) {
+            Object newKey = idGenerator.next(all().stream().map(t -> getField(primaryKey, t)).collect(Collectors.toList()));
+            setField(primaryKey, insertObject, newKey);
+        }
+        insert(insertObject);
+        return insertObject;
+    }
+
+    private T cloneObject(T newObject) {
+        return new Gson().fromJson(new Gson().toJson(newObject), clz);
+    }
+
+    private void setField(String field, Object object, Object newValue) {
+        try {
+            System.out.println(object.getClass());
+            String methodName = "set" + field.substring(0, 1).toUpperCase() + field.substring(1);
+            Field primaryKeyField = object.getClass().getDeclaredField(field);
+            Method method = clz.getMethod(methodName, primaryKeyField.getType());
+            method.invoke(object, newValue);
+        } catch (Exception e) {
+            throw new MethodException(e);
+        }
     }
 }
