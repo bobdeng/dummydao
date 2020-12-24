@@ -58,14 +58,6 @@ public class DummyDao<T, PK> {
         }
     }
 
-    public void deleteById(String idName, Object newObject) {
-        this.jsonList = jsonList.stream()
-                .map(json -> new Gson().fromJson(json, clz))
-                .filter(entity -> !Objects.equals(newObject, getField(idName, entity)))
-                .map(entity -> new Gson().toJson(entity))
-                .collect(Collectors.toList());
-    }
-
 
     public Optional<T> findById(String idField, Object value) {
         return jsonList.stream()
@@ -108,5 +100,13 @@ public class DummyDao<T, PK> {
         } catch (Exception e) {
             throw new MethodException(e);
         }
+    }
+
+    public void delete(T object) {
+        this.jsonList = jsonList.stream()
+                .map(json -> new Gson().fromJson(json, clz))
+                .filter(entity -> !Objects.equals(getField(primaryKey, object), getField(primaryKey, entity)))
+                .map(entity -> new Gson().toJson(entity))
+                .collect(Collectors.toList());
     }
 }

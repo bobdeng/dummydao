@@ -43,7 +43,7 @@ public class DummyDaoTest {
     public void should_remove_when_delete() {
         DummyDao<TestEntityOther, Integer> dummyDao = new DummyDao<>(TestEntityOther.class, "id", new AutoIntegerIdGenerator());
         dummyDao.insert(new TestEntityOther(1, "hello1"));
-        dummyDao.deleteById("id", 1);
+        dummyDao.delete(new TestEntityOther(1, "123"));
         assertThat(dummyDao.all().isEmpty(), is(true));
     }
 
