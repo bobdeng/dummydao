@@ -46,18 +46,28 @@ public class DummyDaoTest {
         dummyDao.insert(new TestEntityNoGetter(1, "hello1"));
         dummyDao.updateById(new TestEntityNoGetter(1, "world"), "id");
     }
+
     @Test
-    public void should_remove_when_delete(){
+    public void should_remove_when_delete() {
         DummyDao<TestEntityOther> dummyDao = new DummyDao<>(TestEntityOther.class);
         dummyDao.insert(new TestEntityOther(1, "hello1"));
-        dummyDao.deleteById("id",1);
-        assertThat(dummyDao.all().isEmpty(),is(true));
+        dummyDao.deleteById("id", 1);
+        assertThat(dummyDao.all().isEmpty(), is(true));
     }
+
     @Test
-    public void should_return_find_by_id(){
+    public void should_return_find_by_id() {
         DummyDao<TestEntityOther> dummyDao = new DummyDao<>(TestEntityOther.class);
         dummyDao.insert(new TestEntityOther(1, "hello1"));
-        assertThat(dummyDao.findById("id",1),is(Optional.of(new TestEntityOther(1, "hello1"))));
+        assertThat(dummyDao.findById("id", 1), is(Optional.of(new TestEntityOther(1, "hello1"))));
+    }
+
+    @Test
+    public void should_update_by_primary_key() {
+        DummyDao<TestEntityOther> dummyDao = new DummyDao<>(TestEntityOther.class, "id");
+        dummyDao.insert(new TestEntityOther(1, "hello"));
+        dummyDao.save(new TestEntityOther(1, "world"));
+        assertThat(dummyDao.findById(1), is(Optional.of(new TestEntityOther(1, "world"))));
     }
 
 

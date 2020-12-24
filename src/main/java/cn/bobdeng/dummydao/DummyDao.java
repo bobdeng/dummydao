@@ -3,18 +3,21 @@ package cn.bobdeng.dummydao;
 import com.google.gson.Gson;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DummyDao<T> {
     private List<String> jsonList = new ArrayList<>();
-    private Class<T> clz;
+    private final Class<T> clz;
+    private final String primaryKey;
 
     public DummyDao(Class<T> clz) {
+        this(clz, "id");
+    }
+
+    public DummyDao(Class<T> clz, String primaryKey) {
         this.clz = clz;
+        this.primaryKey = primaryKey;
     }
 
     public List<T> all() {
@@ -69,5 +72,19 @@ public class DummyDao<T> {
                 .map(json -> new Gson().fromJson(json, clz))
                 .filter(entity -> Objects.equals(value, getField(idField, entity)))
                 .findFirst();
+    }
+
+    public Optional<T> findById(Object value) {
+        return findById(primaryKey, value);
+    }
+
+
+    public void save(T newObject) {
+        boolean exist = findById(primaryKey, getField(primaryKey, newObject)).isPresent();
+        if (exist) {
+            updateById(newObject, primaryKey);
+            return;
+        }
+        insert(newObject);
     }
 }
