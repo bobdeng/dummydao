@@ -78,12 +78,15 @@ public class DummyDao<T, PK> {
             return null;
         }
         T insertObject = cloneObject(newObject);
+        generateIdIfNotExist(insertObject);
+        return insert(insertObject);
+    }
+
+    private void generateIdIfNotExist(T insertObject) {
         if (!idGenerator.hasId(getField(primaryKey, insertObject))) {
             Object newKey = idGenerator.next(all().stream().map(t -> getField(primaryKey, t)).collect(Collectors.toList()));
             setField(primaryKey, insertObject, newKey);
         }
-        insert(insertObject);
-        return insertObject;
     }
 
     private T cloneObject(T newObject) {
