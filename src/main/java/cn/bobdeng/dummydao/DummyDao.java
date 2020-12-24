@@ -19,14 +19,6 @@ public class DummyDao<T, PK> {
         this.idGenerator = idGenerator;
     }
 
-    public DummyDao(Class<T> clz) {
-        this(clz, "id", null);
-    }
-
-    public DummyDao(Class<T> clz, String primaryKey) {
-        this(clz, primaryKey, null);
-    }
-
     public List<T> all() {
         return this.jsonList.stream()
                 .map(json -> new Gson().fromJson(json, clz))
@@ -38,7 +30,7 @@ public class DummyDao<T, PK> {
         return entity;
     }
 
-    public void updateById(T newObject, String idName) {
+    private void updateById(T newObject, String idName) {
         this.jsonList = jsonList.stream()
                 .map(json -> new Gson().fromJson(json, clz))
                 .map(entity -> updateWhenSame(entity, newObject, idName))
@@ -73,6 +65,7 @@ public class DummyDao<T, PK> {
                 .map(entity -> new Gson().toJson(entity))
                 .collect(Collectors.toList());
     }
+
 
     public Optional<T> findById(String idField, Object value) {
         return jsonList.stream()
