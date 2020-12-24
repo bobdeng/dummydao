@@ -103,9 +103,13 @@ public class DummyDao<T, PK> {
     }
 
     public void delete(T object) {
+        this.deleteById(getField(primaryKey, object));
+    }
+
+    public void deleteById(PK id) {
         this.jsonList = jsonList.stream()
                 .map(json -> new Gson().fromJson(json, clz))
-                .filter(entity -> !Objects.equals(getField(primaryKey, object), getField(primaryKey, entity)))
+                .filter(entity -> !Objects.equals(id, getField(primaryKey, entity)))
                 .map(entity -> new Gson().toJson(entity))
                 .collect(Collectors.toList());
     }

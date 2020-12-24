@@ -46,6 +46,13 @@ public class DummyDaoTest {
         dummyDao.delete(new TestEntityOther(1, "123"));
         assertThat(dummyDao.all().isEmpty(), is(true));
     }
+    @Test
+    public void should_remove_when_delete_by_id() {
+        DummyDao<TestEntityOther, Integer> dummyDao = new DummyDao<>(TestEntityOther.class, "id", new AutoIntegerIdGenerator());
+        dummyDao.insert(new TestEntityOther(1, "hello1"));
+        dummyDao.deleteById(1);
+        assertThat(dummyDao.all().isEmpty(), is(true));
+    }
 
     @Test
     public void should_return_find_by_id() {
