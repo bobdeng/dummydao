@@ -95,7 +95,6 @@ public class DummyDao<T, PK> {
 
     private void setField(String field, Object object, Object newValue) {
         try {
-            System.out.println(object.getClass());
             String methodName = "set" + field.substring(0, 1).toUpperCase() + field.substring(1);
             Field primaryKeyField = object.getClass().getDeclaredField(field);
             Method method = clz.getMethod(methodName, primaryKeyField.getType());
