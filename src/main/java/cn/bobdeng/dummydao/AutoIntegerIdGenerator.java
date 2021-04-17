@@ -10,6 +10,6 @@ public class AutoIntegerIdGenerator implements IdGenerator<Integer> {
 
     @Override
     public boolean hasId(Integer value) {
-        return value != 0;
+        return value != null && value != 0;
     }
 }
