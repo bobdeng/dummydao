@@ -75,7 +75,7 @@ public class DummyDao<T, PK> {
         boolean exist = findById(primaryKey, getField(primaryKey, newObject)).isPresent();
         if (exist) {
             updateById(newObject, primaryKey);
-            return null;
+            return newObject;
         }
         T insertObject = cloneObject(newObject);
         generateIdIfNotExist(insertObject);

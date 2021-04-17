@@ -66,7 +66,8 @@ public class DummyDaoTest {
     public void should_update_by_primary_key() {
         DummyDao<TestEntityOther, Integer> dummyDao = new DummyDao<>(TestEntityOther.class, "id", new AutoIntegerIdGenerator());
         dummyDao.insert(new TestEntityOther(1, "hello"));
-        dummyDao.save(new TestEntityOther(1, "world"));
+        TestEntityOther saved = dummyDao.save(new TestEntityOther(1, "world"));
+        assertThat(saved, is(new TestEntityOther(1, "world")));
         assertThat(dummyDao.findById(1), is(Optional.of(new TestEntityOther(1, "world"))));
     }
 
